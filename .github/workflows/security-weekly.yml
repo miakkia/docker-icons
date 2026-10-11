@@ -1,0 +1,26 @@
+name: Weekly Security Scan
+
+on:
+  schedule:
+    - cron: '35 10 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Scan repository for exposed secrets and misconfigurations
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          exit-code: '1'
+          scanners: 'secret,misconfig'
+          severity: 'HIGH,CRITICAL'
